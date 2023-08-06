@@ -61,8 +61,8 @@ func (s *service) formatCardsTable(cards []domain.Cards) string {
 		"<th style='border: 1px solid black; padding: 10px;'>Set Name</th>" +
 		"<th style='border: 1px solid black; padding: 10px;'>Collector Number</th>" +
 		"<th style='border: 1px solid black; padding: 10px;'>Foil</th>" +
-		"<th style='border: 1px solid black; padding: 10px;'>Last Price</th>" +
 		"<th style='border: 1px solid black; padding: 10px;'>Old Price</th>" +
+		"<th style='border: 1px solid black; padding: 10px;'>Last Price</th>" +
 		"<th style='border: 1px solid black; padding: 10px;'>Price Change</th>" +
 		"<th style='border: 1px solid black; padding: 10px;'>Last Update</th>" +
 		"</tr>"
@@ -95,7 +95,7 @@ func (s *service) formatCardsTable(cards []domain.Cards) string {
 
 		row := fmt.Sprintf(rowFormat,
 			card.ID, card.Name, card.SetName, card.CollectorNumber,
-			card.Foil, card.LastPrice, card.OldPrice, color, card.PriceChange,
+			card.Foil, card.OldPrice, card.LastPrice, color, card.PriceChange,
 			lastUpdate.Format(time.RFC1123))
 		builder.WriteString(row)
 	}
@@ -121,14 +121,4 @@ func (s *service) formatCardsPrice(price domain.CardsPrice) string {
 		color, price.OldPrice, price.NewPrice, price.PriceChange))
 
 	return builder.String()
-}
-
-func (c *service) logError(card domain.Cards, err error) {
-	c.log.WithFields(logrus.Fields{
-		"card_id":          card.ID,
-		"card_name":        card.Name,
-		"set_name":         card.SetName,
-		"collector_number": card.CollectorNumber,
-		"foil":             card.Foil,
-	}).Warn(err)
 }

@@ -1,0 +1,237 @@
+openapi: 3.0.0
+info:
+  title: Magic The Gathering Card API
+  description: API for managing Magic The Gathering cards.
+  version: 1.0.0
+servers:
+  - url: http://api.example.com
+paths:
+  /insert-card:
+    post:
+      summary: Insert a single Magic The Gathering card into the database.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequestInsertCard'
+      responses:
+        '200':
+          description: Card inserted successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseInsertCard'
+        '400':
+          description: Bad request. Invalid payload format or missing required fields.
+        '500':
+          description: Internal server error. Failed to insert card into the database.
+  /insert-cards:
+    post:
+      summary: Insert multiple Magic The Gathering cards into the database.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                cards:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Cards inserted successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseConciliateJob'
+        '500':
+          description: Internal server error. Failed to insert cards into the database.
+  /card/{id}:
+    get:
+      summary: Get a Magic The Gathering card by its ID.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID of the card to retrieve.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Card retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseCard'
+        '400':
+          description: Bad request. Invalid card ID format.
+        '404':
+          description: Card not found.
+        '500':
+          description: Internal server error. Failed to retrieve the card.
+  /cards:
+    get:
+      summary: Get Magic The Gathering cards based on filters.
+      parameters:
+        - name: set_name
+          in: query
+          required: false
+          description: Filter cards by set name.
+          schema:
+            type: string
+        - name: name
+          in: query
+          required: false
+          description: Filter cards by card name.
+          schema:
+            type: string
+        - name: collector_number
+          in: query
+          required: false
+          description: Filter cards by collector number.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Cards retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ResponseCard'
+        '500':
+          description: Internal server error. Failed to retrieve cards.
+  /delete-card/{id}:
+    delete:
+      summary: Delete a Magic The Gathering card by its ID.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID of the card to delete.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Card deleted successfully.
+        '400':
+          description: Bad request. Invalid card ID format.
+        '500':
+          description: Internal server error. Failed to delete the card.
+  /card-history/{id}:
+    get:
+      summary: Get the price history of a Magic The Gathering card by its ID.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID of the card to get the price history.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Price history retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ResponseCard'
+        '400':
+          description: Bad request. Invalid card ID format.
+        '404':
+          description: Card not found.
+        '500':
+          description: Internal server error. Failed to get the price history.
+  /update-card/{id}:
+    patch:
+      summary: Update a Magic The Gathering card by its ID.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID of the card to update.
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequestUpdateCard'
+      responses:
+        '200':
+          description: Card updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseCard'
+        '400':
+          description: Bad request. Invalid payload format or missing required fields.
+        '404':
+          description: Card not found.
+        '500':
+          description: Internal server error. Failed to update the card.
+components:
+  schemas:
+    RequestInsertCard:
+      type: object
+      properties:
+        Name:
+          type: string
+        SetName:
+          type: string
+        CollectorNumber:
+          type: string
+        Foil:
+          type: boolean
+    RequestUpdateCard:
+      type: object
+      properties:
+        Name:
+          type: string
+    ResponseInsertCard:
+      type: object
+      properties:
+        ID:
+          type: integer
+        Name:
+          type: string
+        Set:
+          type: string
+        CollectorNumber:
+          type: string
+        Foil:
+          type: boolean
+    ResponseCard:
+      type: object
+      properties:
+        ID:
+          type: integer
+        Name:
+          type: string
+        Set:
+          type: string
+        CollectorNumber:
+          type: string
+        Foil:
+          type: boolean
+        LastPrice:
+          type: number
+        OldPrice:
+          type: number
+        PriceChange:
+          type: number
+        LastUpdate:
+          type: string
+          format: date-time
+    ResponseConciliateJob:
+      type: object
+      properties:
+        Processed:
+          type: integer
+        NotProcessed:
+          type: integer

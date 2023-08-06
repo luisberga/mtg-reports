@@ -83,7 +83,7 @@ func (r *repository) GetCardsReport(ctx context.Context) ([]domain.Cards, error)
 		ON 
 			c.id = cd.card_id AND cd.rn = 1
 	) main 
-	ORDER BY price_change DESC LIMIT 20;`
+	ORDER BY price_change DESC LIMIT 100;`
 
 	rows, err := r.db.QueryContext(ctx, getCardsQuery)
 	if err != nil {

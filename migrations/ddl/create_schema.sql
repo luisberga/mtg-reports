@@ -14,7 +14,7 @@ CREATE TABLE `cards` (
     PRIMARY KEY (`id`),
     INDEX `idx_cards_name` (`name`),
     UNIQUE INDEX `unique_idx` (`set_name`, `collector_number`, `foil`)
-) ENGINE = InnoDB AUTO_INCREMENT = 1 DEFAULT CHARSET = latin1;
+) AUTO_INCREMENT = 1 DEFAULT CHARSET = latin1;
 
 CREATE TABLE `cards_details` (
     `id` int unsigned NOT NULL AUTO_INCREMENT,
@@ -30,7 +30,7 @@ CREATE TABLE `cards_details` (
         REFERENCES `cards` (`id`)
         ON DELETE CASCADE
         ON UPDATE CASCADE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 DEFAULT CHARSET = latin1;
+) AUTO_INCREMENT = 1 DEFAULT CHARSET = latin1;
 
 CREATE TABLE `prices` (
     `id` int unsigned NOT NULL AUTO_INCREMENT,
@@ -40,7 +40,7 @@ CREATE TABLE `prices` (
     `last_update` datetime NOT NULL,
     PRIMARY KEY (`id`),
     INDEX `idx_last_update` (`last_update`)
-) ENGINE = InnoDB AUTO_INCREMENT = 1 DEFAULT CHARSET = latin1;
+) AUTO_INCREMENT = 1 DEFAULT CHARSET = latin1;
 
 
 

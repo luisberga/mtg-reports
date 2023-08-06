@@ -1,0 +1,27 @@
+# Binaries, plugins, libs
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binary
+*.test
+
+# Output files
+*.out
+
+# Build files
+*_string.go
+
+# Vendor directory
+/vendor/
+
+# IDE files
+.idea/
+
+# Log files
+*.log
+
+# YAML Config
+config.yaml
