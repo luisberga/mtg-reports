@@ -1,0 +1,60 @@
+name: Samwise the Stouthearted, set_name: ltr, collector_id: 449, foil: true
+name: Frodo Sauron Bane, set_name: ltr, collector_id: 448, foil: true
+name: Pippins Bravery, set_name: ltr, collector_id: 414, foil: true
+name: Gandalf Amigo do Condado, set_name: ltr, collector_id: 401, foil: true
+name: Gollum Conspirador Paciente, set_name: ltr, collector_id: 84, foil: false
+name: Principe Imrahil, o Belo, set_name: ltr, collector_id: 431, foil: false
+name: Rosa Villa da Alameda Sul, set_name: ltr, collector_id: 440, foil: false
+name: Mirkwood Bats, set_name: ltr, collector_id: 95, foil: true
+name: Living Death, set_name: ltc, collector_id: 203, foil: false
+name: Foray of Orcs, set_name: ltr, collector_id: 417, foil: false
+name: Olifante, set_name: ltr, collector_id: 426, foil: false
+name: Many Partings, set_name: ltr, collector_id: 445, foil: true
+name: Many Partings, set_name: ltr, collector_id: 176, foil: false
+name: Meriadoc Brandybuck, set_name: ltr, collector_id: 177, foil: false
+name: Furia de Gimli, set_name: ltr, collector_id: 131, foil: false
+name: Vanguarda dos Lestenses, set_name: ltr, collector_id: 83, foil: false
+name: Deep Analysis, set_name: ltr, collector_id: 188, foil: false
+name: Whose Pathfinder, set_name: ltr, collector_id: 190, foil: false
+name: Long List of the Ents, set_name: ltr, collector_id: 174, foil: false
+name: Entish Restoration, set_name: ltr, collector_id: 163, foil: false
+name: Quickbeam Upstart Ent, set_name: ltr, collector_id: 183, foil: false
+name: Éomer Marechal de Rodahn, set_name: ltr, collector_id: 120, foil: false
+name: Fall of Gil-galad, set_name: ltr, collector_id: 165, foil: false
+name: Elrond, Lord of Rivendell, set_name: ltr, collector_id: 307, foil: false
+name: Stern Scolding, set_name: ltr, collector_id: 71, foil: false
+name: Bill Ferny, Bree Swindler, set_name: ltr, collector_id: 42, foil: false
+name: Meneldor, Swift Savior, set_name: ltr, collector_id: 62, foil: false
+name: Uglúk da Mão Branca, set_name: ltr, collector_id: 235, foil: false
+name: Knights of Dol Amroth, set_name: ltr, collector_id: 59, foil: false
+name: Pelargir Survivor, set_name: ltr, collector_id: 64, foil: false
+name: Isolation ar Orthanc, set_name: ltr, collector_id: 57, foil: false
+name: Captain of Umbar, set_name: ltr, collector_id: 45, foil: false
+name: Horses of the Bruinen, set_name: ltr, collector_id: 55, foil: false
+name: Soothing of Sméagol, set_name: ltr, collector_id: 70, foil: false
+name: Notion Thief, set_name: ltr, collector_id: 270, foil: false
+name: Elvish Mariner, set_name: ltr, collector_id: 283, foil: false
+name: Second Breakfast, set_name: ltr, collector_id: 29, foil: false
+name: Hobbit's Sting, set_name: ltr, collector_id: 20, foil: false
+name: Stalwarts of Osgiliath, set_name: ltr, collector_id: 33, foil: false
+name: Shire Shirriff, set_name: ltr, collector_id: 30, foil: false
+name: Errand-Rider of Gondor, set_name: ltr, collector_id: 11, foil: false
+name: Landroval, Horizon Witness, set_name: ltr, collector_id: 21, foil: false
+name: Protector of Gondor, set_name: ltr, collector_id: 25, foil: false
+name: Slip on the Ring, set_name: ltr, collector_id: 31, foil: false
+name: Escape from Orthanc, set_name: ltr, collector_id: 12, foil: false
+name: Eagles of the North, set_name: ltr, collector_id: 7, foil: false
+name: Rosie Cotton of South Lane, set_name: ltr, collector_id: 27, foil: false
+name: Esquire of the King, set_name: ltr, collector_id: 13, foil: false
+name: Dúnedain Blade, set_name: ltr, collector_id: 6, foil: false
+name: Languish, set_name: ltr, collector_id: 202, foil: false
+name: Bill the Pony, set_name: ltr, collector_id: 3, foil: false
+name: Troll of Khazad-dûm, set_name: ltr, collector_id: 111, foil: false
+name: Uruk-hai Berserker, set_name: ltr, collector_id: 112, foil: true
+name: Grishnákh, Instigador Ousado, set_name: ltr, collector_id: 134, foil: false
+name: Marcha do Portão Negro, set_name: ltr, collector_id: 94, foil: false
+name: Éowyn, Cavaleira Destemida, set_name: ltr, collector_id: 201, foil: false
+name: Merciless Executioner, set_name: ltr, collector_id: 204, foil: false
+name: Cirith Ungol Patrol, set_name: ltr, collector_id: 80, foil: false
+name: Golpear o Imortal, set_name: ltr, collector_id: 148, foil: false
+name: Mushroom Watchdogs, set_name: ltr, collector_id: 180, foil: true
