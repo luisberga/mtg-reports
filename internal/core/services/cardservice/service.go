@@ -176,7 +176,7 @@ func (c *service) InsertCards(ctx context.Context, file multipart.File) (int64, 
 
 	scanner := bufio.NewScanner(file)
 
-	re := regexp.MustCompile(`name: ([\p{L}\s-,'"]+), set_name: ([\p{L}\s-]+), collector_id: ([\w\s]+), foil: ([\w\s]+)`)
+	re := regexp.MustCompile(`name: ([\p{L}\s-,'"!?]+), set_name: ([\p{L}\s-]+), collector_number: ([\w\s]+), foil: ([\w\s]+)`)
 
 	go func() {
 		defer close(cardsCh)
@@ -190,7 +190,7 @@ func (c *service) InsertCards(ctx context.Context, file multipart.File) (int64, 
 
 			matches := re.FindStringSubmatch(line)
 			if len(matches) != 5 {
-				c.log.Info("line does not follow the expected format")
+				c.log.WithFields(logrus.Fields{"line": line}).Warn("service failed to parse line in insert cards")
 				cardsNotProcessed++
 				continue
 			}
@@ -208,7 +208,6 @@ func (c *service) InsertCards(ctx context.Context, file multipart.File) (int64, 
 			}
 
 			cards = append(cards, card)
-
 			if len(cards) == c.commitSize {
 				cardsCh <- cards
 				cards = make([]domain.Cards, 0, c.commitSize)

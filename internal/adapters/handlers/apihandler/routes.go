@@ -15,26 +15,40 @@ type cards interface {
 func SetupRouter(c cards) *http.ServeMux {
 	mux := http.NewServeMux()
 
-	//POST
-	mux.HandleFunc("/insert-card", c.InsertCard)
+	mux.HandleFunc("/card", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodPost:
+			c.InsertCard(w, r)
+		default:
+			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		}
+	})
 
-	//POST
-	mux.HandleFunc("/insert-cards", c.InsertCards)
+	mux.HandleFunc("/card/", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodGet:
+			c.GetCardbyID(w, r)
+		case http.MethodPatch:
+			c.UpdateCard(w, r)
+		case http.MethodDelete:
+			c.DeleteCard(w, r)
+		default:
+			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		}
+	})
 
-	//GET card/{id}
-	mux.HandleFunc("/card/", c.GetCardbyID)
+	mux.HandleFunc("/cards", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodPost:
+			c.InsertCards(w, r)
+		case http.MethodGet:
+			c.GetCards(w, r)
+		default:
+			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		}
+	})
 
-	//GET cards?set_name={set_name}?name={name}?collector_number={collector_number}
-	mux.HandleFunc("/cards", c.GetCards)
-
-	//DELETE delete-card/{id}
-	mux.HandleFunc("/delete-card/", c.DeleteCard)
-
-	//GET card-history/{id}
 	mux.HandleFunc("/card-history/", c.GetCardHistory)
-
-	//PATCH update-card/{id}
-	mux.HandleFunc("/update-card/", c.UpdateCard)
 
 	return mux
 }

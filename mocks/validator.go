@@ -24,8 +24,8 @@ func (v *ValidateMock) CardID(parts []string) (string, error) {
 	return args.String(0), args.Error(1)
 }
 
-func (v *ValidateMock) Filters(setName, name, collector_id string) map[string]string {
-	args := v.Called(setName, name, collector_id)
+func (v *ValidateMock) Filters(setName, name, collector_number string) map[string]string {
+	args := v.Called(setName, name, collector_number)
 	return args.Get(0).(map[string]string)
 }
 

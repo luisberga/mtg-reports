@@ -15,13 +15,13 @@ API Usage
 
 The API exposes several endpoints for card management. Here are the routes provided:
 
--   POST `/insert-card`: Inserts a single card into the database.
--   POST `/insert-cards`: Inserts multiple cards into the database in bulk.
+-   POST `/card`: Inserts a single card into the database.
+-   POST `/cards`: Inserts multiple cards into the database in bulk.
 -   GET `/card/{id}`: Retrieves a card by its ID.
 -   GET `/cards`: Retrieves cards filtered by set name, card name, or collector number.
--   DELETE `/delete-card/{id}`: Deletes a card by its ID.
+-   DELETE `/card/{id}`: Deletes a card by its ID.
 -   GET `/card-history/{id}`: Retrieves the price history of a card by its ID.
--   PATCH `/update-card/{id}`: Updates a card by its ID.
+-   PATCH `/card/{id}`: Updates a card by its ID.
 
 ### Request and Response Formats
 
@@ -31,13 +31,13 @@ Details can be found in swagger file in `/docs/swagger.yaml`
 
 ### Bulk insert Cards
 
-The `insert-cards` endpoint expects a POST request with a file attached. The file must be named cards.txt and should contain multiple entries, each in the following format:
+The `POST /cards` endpoint expects a POST request with a file attached. The file must be named cards.txt and should contain multiple entries, each in the following format:
 
-`name: card name, set_name: set name, collector_id: collector number, foil: boolean`
+`name: card name, set_name: set name, collector_number: collector number, foil: boolean`
 
 Example: 
 
-`name: Samwise the Stouthearted, set_name: ltr, collector_id: 449, foil: true`
+`name: Samwise the Stouthearted, set_name: ltr, collector_number: 449, foil: true`
 
 The response includes the count of processed and unprocessed entries:
 

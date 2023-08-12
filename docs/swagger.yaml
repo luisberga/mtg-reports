@@ -6,7 +6,7 @@ info:
 servers:
   - url: http://api.example.com
 paths:
-  /insert-card:
+  /card:
     post:
       summary: Insert a single Magic The Gathering card into the database.
       requestBody:
@@ -26,7 +26,7 @@ paths:
           description: Bad request. Invalid payload format or missing required fields.
         '500':
           description: Internal server error. Failed to insert card into the database.
-  /insert-cards:
+  /cards:
     post:
       summary: Insert multiple Magic The Gathering cards into the database.
       requestBody:
@@ -48,30 +48,6 @@ paths:
                 $ref: '#/components/schemas/ResponseConciliateJob'
         '500':
           description: Internal server error. Failed to insert cards into the database.
-  /card/{id}:
-    get:
-      summary: Get a Magic The Gathering card by its ID.
-      parameters:
-        - name: id
-          in: path
-          required: true
-          description: ID of the card to retrieve.
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Card retrieved successfully.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ResponseCard'
-        '400':
-          description: Bad request. Invalid card ID format.
-        '404':
-          description: Card not found.
-        '500':
-          description: Internal server error. Failed to retrieve the card.
-  /cards:
     get:
       summary: Get Magic The Gathering cards based on filters.
       parameters:
@@ -104,7 +80,29 @@ paths:
                   $ref: '#/components/schemas/ResponseCard'
         '500':
           description: Internal server error. Failed to retrieve cards.
-  /delete-card/{id}:
+  /card/{id}:
+    get:
+      summary: Get a Magic The Gathering card by its ID.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID of the card to retrieve.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Card retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseCard'
+        '400':
+          description: Bad request. Invalid card ID format.
+        '404':
+          description: Card not found.
+        '500':
+          description: Internal server error. Failed to retrieve the card.
     delete:
       summary: Delete a Magic The Gathering card by its ID.
       parameters:
@@ -121,32 +119,6 @@ paths:
           description: Bad request. Invalid card ID format.
         '500':
           description: Internal server error. Failed to delete the card.
-  /card-history/{id}:
-    get:
-      summary: Get the price history of a Magic The Gathering card by its ID.
-      parameters:
-        - name: id
-          in: path
-          required: true
-          description: ID of the card to get the price history.
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Price history retrieved successfully.
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/ResponseCard'
-        '400':
-          description: Bad request. Invalid card ID format.
-        '404':
-          description: Card not found.
-        '500':
-          description: Internal server error. Failed to get the price history.
-  /update-card/{id}:
     patch:
       summary: Update a Magic The Gathering card by its ID.
       parameters:
@@ -175,63 +147,88 @@ paths:
           description: Card not found.
         '500':
           description: Internal server error. Failed to update the card.
+  /card-history/{id}:
+    get:
+      summary: Get the price history of a Magic The Gathering card by its ID.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID of the card to get the price history.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Price history retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ResponseCard'
+        '400':
+          description: Bad request. Invalid card ID format.
+        '404':
+          description: Card not found.
+        '500':
+          description: Internal server error. Failed to get the price history.
 components:
   schemas:
     RequestInsertCard:
       type: object
       properties:
-        Name:
+        name:
           type: string
-        SetName:
+        set_name:
           type: string
-        CollectorNumber:
+        collector_number:
           type: string
-        Foil:
+        foil:
           type: boolean
     RequestUpdateCard:
       type: object
       properties:
-        Name:
+        name:
           type: string
     ResponseInsertCard:
       type: object
       properties:
-        ID:
+        id:
           type: integer
-        Name:
+        name:
           type: string
-        Set:
+        set:
           type: string
-        CollectorNumber:
+        collector_number:
           type: string
-        Foil:
+        foil:
           type: boolean
     ResponseCard:
       type: object
       properties:
-        ID:
+        id:
           type: integer
-        Name:
+        name:
           type: string
-        Set:
+        set:
           type: string
-        CollectorNumber:
+        collector_number:
           type: string
-        Foil:
+        foil:
           type: boolean
-        LastPrice:
+        last_price:
           type: number
-        OldPrice:
+        old_price:
           type: number
-        PriceChange:
+        price_change:
           type: number
-        LastUpdate:
+        last_update:
           type: string
           format: date-time
     ResponseConciliateJob:
       type: object
       properties:
-        Processed:
+        processed:
           type: integer
-        NotProcessed:
+        not_processed:
           type: integer

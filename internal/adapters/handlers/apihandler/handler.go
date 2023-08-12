@@ -36,11 +36,6 @@ func New(v validate, cs ports.CardService, log logrus.Logger) *apiHandler {
 func (h *apiHandler) InsertCard(w http.ResponseWriter, r *http.Request) {
 	h.log.Info("handler insert card")
 
-	if r.Method != http.MethodPost {
-		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
-		return
-	}
-
 	card := dtos.RequestInsertCard{}
 
 	body, err := io.ReadAll(r.Body)
@@ -83,10 +78,6 @@ func (h *apiHandler) InsertCard(w http.ResponseWriter, r *http.Request) {
 // TODO use queue here in future
 func (h *apiHandler) InsertCards(w http.ResponseWriter, r *http.Request) {
 	h.log.Info("handler insert cards")
-	if r.Method != http.MethodPost {
-		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
-		return
-	}
 
 	file, _, err := r.FormFile("cards")
 	if err != nil {
@@ -109,10 +100,6 @@ func (h *apiHandler) InsertCards(w http.ResponseWriter, r *http.Request) {
 
 func (h *apiHandler) GetCardbyID(w http.ResponseWriter, r *http.Request) {
 	h.log.Info("handler get card by id")
-	if r.Method != http.MethodGet {
-		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
-		return
-	}
 
 	parts := strings.Split(r.URL.Path, "/")
 	id, err := h.validator.CardID(parts)
@@ -137,10 +124,6 @@ func (h *apiHandler) GetCardbyID(w http.ResponseWriter, r *http.Request) {
 
 func (h *apiHandler) GetCards(w http.ResponseWriter, r *http.Request) {
 	h.log.Info("handler get cards")
-	if r.Method != http.MethodGet {
-		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
-		return
-	}
 
 	setName := r.URL.Query().Get("set_name")
 	name := r.URL.Query().Get("name")
@@ -163,10 +146,6 @@ func (h *apiHandler) GetCards(w http.ResponseWriter, r *http.Request) {
 
 func (h *apiHandler) DeleteCard(w http.ResponseWriter, r *http.Request) {
 	h.log.Info("handler delete cards")
-	if r.Method != http.MethodDelete {
-		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
-		return
-	}
 
 	parts := strings.Split(r.URL.Path, "/")
 	id, err := h.validator.CardID(parts)
@@ -187,10 +166,6 @@ func (h *apiHandler) DeleteCard(w http.ResponseWriter, r *http.Request) {
 
 func (h *apiHandler) GetCardHistory(w http.ResponseWriter, r *http.Request) {
 	h.log.Info("handler get card history")
-	if r.Method != http.MethodGet {
-		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
-		return
-	}
 
 	parts := strings.Split(r.URL.Path, "/")
 	id, err := h.validator.CardID(parts)
@@ -215,10 +190,6 @@ func (h *apiHandler) GetCardHistory(w http.ResponseWriter, r *http.Request) {
 
 func (h *apiHandler) UpdateCard(w http.ResponseWriter, r *http.Request) {
 	h.log.Info("handler update card")
-	if r.Method != http.MethodPatch {
-		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
-		return
-	}
 
 	parts := strings.Split(r.URL.Path, "/")
 	id, err := h.validator.CardID(parts)
