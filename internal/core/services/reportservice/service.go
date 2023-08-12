@@ -117,7 +117,7 @@ func (s *service) formatCardsPrice(price domain.CardsPrice) string {
 		color = "<span style='color: black;'>stayed the same</span>"
 	}
 
-	builder.WriteString(fmt.Sprintf("The total value of your MTG card investment has %s from <strong>$%.2f</strong> to <strong>$%.2f</strong>. That's a change of <strong>$%.2f</strong>.",
+	builder.WriteString(fmt.Sprintf("The total value of your MTG card investment has %s from <strong>R$%.2f</strong> to <strong>R$%.2f</strong>. That's a change of <strong>R$%.2f</strong>.",
 		color, price.OldPrice, price.NewPrice, price.PriceChange))
 
 	return builder.String()

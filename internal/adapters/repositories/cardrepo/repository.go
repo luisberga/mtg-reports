@@ -132,7 +132,9 @@ func (r *repository) GetCards(ctx context.Context, filters map[string]string) ([
 			cards_details
 	) cd
 	ON 
-		c.id = cd.card_id AND cd.rn = 1 
+		c.id = cd.card_id AND cd.rn = 1
+        ORDER BY 
+		last_price DESC
 		`
 
 	var first bool = true
