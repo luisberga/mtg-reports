@@ -111,46 +111,45 @@ func (r *repository) GetCardbyID(ctx context.Context, id string) (domain.Cards, 
 }
 
 func (r *repository) GetCards(ctx context.Context, filters map[string]string) ([]domain.Cards, error) {
-	getCardsQuery := `
-	SELECT 
-		c.id,
-		name,
-		set_name,
-		collector_number,
-		foil,
-		COALESCE(cd.last_price, 0) as last_price,
-		COALESCE(cd.old_price, 0) as old_price,
-		COALESCE(cd.price_change, 0) as price_change,
-		last_update
-	FROM 
-		cards c
-	LEFT JOIN 
-	(
-		SELECT *,
-			ROW_NUMBER() OVER(PARTITION BY card_id ORDER BY last_update DESC) AS rn
-		FROM 
-			cards_details
-	) cd
-	ON 
-		c.id = cd.card_id AND cd.rn = 1
-        ORDER BY 
-		last_price DESC
-		`
+    getCardsQuery := `
+    SELECT 
+        c.id,
+        name,
+        set_name,
+        collector_number,
+        foil,
+        COALESCE(cd.last_price, 0) as last_price,
+        COALESCE(cd.old_price, 0) as old_price,
+        COALESCE(cd.price_change, 0) as price_change,
+        last_update
+    FROM 
+        cards c
+    LEFT JOIN 
+    (
+        SELECT *,
+            ROW_NUMBER() OVER(PARTITION BY card_id ORDER BY last_update DESC) AS rn
+        FROM 
+            cards_details
+    ) cd
+    ON 
+        c.id = cd.card_id AND cd.rn = 1
+    `
 
-	var first bool = true
-	var values []interface{}
+    var first bool = true
+    var values []interface{}
 
-	for key, value := range filters {
-		if !first {
-			getCardsQuery += " AND "
-		} else {
-			getCardsQuery += "WHERE "
-		}
-		getCardsQuery += fmt.Sprintf("%s = ?", key)
-		values = append(values, value)
-		first = false
-	}
-	values = append(values)
+    for key, value := range filters {
+        if !first {
+            getCardsQuery += " AND "
+        } else {
+            getCardsQuery += " WHERE "
+        }
+        getCardsQuery += fmt.Sprintf("%s = ?", key)
+        values = append(values, value)
+        first = false
+    }
+    
+    getCardsQuery += " ORDER BY last_price DESC"
 
 	rows, err := r.db.QueryContext(ctx, getCardsQuery, values...)
 	if err != nil {
