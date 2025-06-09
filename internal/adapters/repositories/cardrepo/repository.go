@@ -111,7 +111,7 @@ func (r *repository) GetCardbyID(ctx context.Context, id string) (domain.Cards, 
 }
 
 func (r *repository) GetCards(ctx context.Context, filters map[string]string) ([]domain.Cards, error) {
-    getCardsQuery := `
+	getCardsQuery := `
     SELECT 
         c.id,
         name,
@@ -135,21 +135,21 @@ func (r *repository) GetCards(ctx context.Context, filters map[string]string) ([
         c.id = cd.card_id AND cd.rn = 1
     `
 
-    var first bool = true
-    var values []interface{}
+	var first bool = true
+	var values []interface{}
 
-    for key, value := range filters {
-        if !first {
-            getCardsQuery += " AND "
-        } else {
-            getCardsQuery += " WHERE "
-        }
-        getCardsQuery += fmt.Sprintf("%s = ?", key)
-        values = append(values, value)
-        first = false
-    }
-    
-    getCardsQuery += " ORDER BY last_price DESC"
+	for key, value := range filters {
+		if !first {
+			getCardsQuery += " AND "
+		} else {
+			getCardsQuery += " WHERE "
+		}
+		getCardsQuery += fmt.Sprintf("%s = ?", key)
+		values = append(values, value)
+		first = false
+	}
+
+	getCardsQuery += " ORDER BY last_price DESC"
 
 	rows, err := r.db.QueryContext(ctx, getCardsQuery, values...)
 	if err != nil {

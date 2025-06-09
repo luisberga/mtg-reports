@@ -80,7 +80,7 @@ func (c *service) GetCards(ctx context.Context, filters map[string]string) ([]dt
 		return nil, fmt.Errorf("service failed to get card: %w", err)
 	}
 
-	var cards []dtos.ResponseCard
+	cards := make([]dtos.ResponseCard, 0, len(cardsDomain))
 	for _, card := range cardsDomain {
 		var lastUpdate time.Time
 		if card.LastUpdate != nil {
@@ -145,7 +145,7 @@ func (c *service) GetCardHistory(ctx context.Context, id string) ([]dtos.Respons
 		return nil, fmt.Errorf("service failed to get card history: %w", err)
 	}
 
-	var cardsResponse []dtos.ResponseCard
+	cardsResponse := make([]dtos.ResponseCard, 0, len(cards))
 	for _, card := range cards {
 		var lastUpdate time.Time
 		if card.LastUpdate != nil {
