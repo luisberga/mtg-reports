@@ -16,13 +16,19 @@ func NewHTTPMock() *httpMock {
 	return &httpMock{}
 }
 
-func (h *httpMock) NewRequestWithContext(ctx context.Context, method string, url string, body interface{}) (web.Request, error) {
+func (h *httpMock) NewRequestWithContext(ctx context.Context, method string, url string, body io.Reader) (web.Request, error) {
 	argsMock := h.Called(ctx, method, url, body)
-	return argsMock.Get(0).(web.Response), argsMock.Error(1)
+	if argsMock.Get(0) == nil {
+		return nil, argsMock.Error(1)
+	}
+	return argsMock.Get(0).(web.Request), argsMock.Error(1)
 }
 
-func (h *httpMock) Do(req context.Context) (web.Response, error) {
+func (h *httpMock) Do(req web.Request) (web.Response, error) {
 	argsMock := h.Called(req)
+	if argsMock.Get(0) == nil {
+		return nil, argsMock.Error(1)
+	}
 	return argsMock.Get(0).(web.Response), argsMock.Error(1)
 }
 
@@ -46,4 +52,8 @@ func (r *responseMock) StatusCode() int {
 
 type requestMock struct {
 	mock.Mock
+}
+
+func NewRequestMock() *requestMock {
+	return &requestMock{}
 }
