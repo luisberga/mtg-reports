@@ -33,3 +33,8 @@ func (v *ValidateMock) CardName(card dtos.RequestUpdateCard) error {
 	args := v.Called(card)
 	return args.Error(0)
 }
+
+func (v *ValidateMock) Pagination(pageStr, limitStr string) (int, int, error) {
+	args := v.Called(pageStr, limitStr)
+	return args.Int(0), args.Int(1), args.Error(2)
+}

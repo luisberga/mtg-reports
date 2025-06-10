@@ -11,6 +11,7 @@ type CardService interface {
 	InsertCards(ctx context.Context, file multipart.File) (int64, int64)
 	GetCardbyID(ctx context.Context, id string) (dtos.ResponseCard, error)
 	GetCards(ctx context.Context, filters map[string]string) ([]dtos.ResponseCard, error)
+	GetCardsPaginated(ctx context.Context, filters map[string]string, page, limit int) (dtos.ResponsePaginatedCards, error)
 	DeleteCard(ctx context.Context, id string) error
 	GetCardHistory(ctx context.Context, id string) ([]dtos.ResponseCard, error)
 	UpdateCard(ctx context.Context, cardRequest dtos.RequestUpdateCard) (dtos.ResponseInsertCard, error)

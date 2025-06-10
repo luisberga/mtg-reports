@@ -64,3 +64,16 @@ func (c *CardsRepositoryMock) UpdateCard(ctx context.Context, card domain.Update
 	}
 	return args.Get(0).(domain.Cards), args.Error(1)
 }
+
+func (c *CardsRepositoryMock) GetCardsPaginated(ctx context.Context, filters map[string]string, offset, limit int) ([]domain.Cards, error) {
+	args := c.Called(ctx, filters, offset, limit)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).([]domain.Cards), args.Error(1)
+}
+
+func (c *CardsRepositoryMock) GetCardsCount(ctx context.Context, filters map[string]string) (int64, error) {
+	args := c.Called(ctx, filters)
+	return args.Get(0).(int64), args.Error(1)
+}

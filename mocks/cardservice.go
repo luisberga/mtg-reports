@@ -50,3 +50,8 @@ func (c *CardServiceMock) UpdateCard(ctx context.Context, cardRequest dtos.Reque
 	args := c.Called(ctx, cardRequest)
 	return args.Get(0).(dtos.ResponseInsertCard), args.Error(1)
 }
+
+func (c *CardServiceMock) GetCardsPaginated(ctx context.Context, filters map[string]string, page, limit int) (dtos.ResponsePaginatedCards, error) {
+	args := c.Called(ctx, filters, page, limit)
+	return args.Get(0).(dtos.ResponsePaginatedCards), args.Error(1)
+}

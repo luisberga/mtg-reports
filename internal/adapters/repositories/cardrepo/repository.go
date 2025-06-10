@@ -326,3 +326,97 @@ func (r *repository) UpdateCard(ctx context.Context, card domain.UpdateCard) (do
 
 	return cardDomain, nil
 }
+
+func (r *repository) GetCardsPaginated(ctx context.Context, filters map[string]string, offset, limit int) ([]domain.Cards, error) {
+	getCardsQuery := `
+    SELECT 
+        c.id,
+        name,
+        set_name,
+        collector_number,
+        foil,
+        COALESCE(cd.last_price, 0) as last_price,
+        COALESCE(cd.old_price, 0) as old_price,
+        COALESCE(cd.price_change, 0) as price_change,
+        last_update
+    FROM 
+        cards c
+    LEFT JOIN 
+    (
+        SELECT *,
+            ROW_NUMBER() OVER(PARTITION BY card_id ORDER BY last_update DESC) AS rn
+        FROM 
+            cards_details
+    ) cd
+    ON 
+        c.id = cd.card_id AND cd.rn = 1
+    `
+
+	var first bool = true
+	var values []interface{}
+
+	for key, value := range filters {
+		if !first {
+			getCardsQuery += " AND "
+		} else {
+			getCardsQuery += " WHERE "
+		}
+		getCardsQuery += fmt.Sprintf("%s = ?", key)
+		values = append(values, value)
+		first = false
+	}
+
+	getCardsQuery += " ORDER BY last_price DESC LIMIT ? OFFSET ?"
+	values = append(values, limit, offset)
+
+	rows, err := r.db.QueryContext(ctx, getCardsQuery, values...)
+	if err != nil {
+		return nil, fmt.Errorf("repository failed to exec query in get cards paginated: %w", err)
+	}
+	defer rows.Close()
+
+	var cardsDomain []domain.Cards
+
+	for rows.Next() {
+		var cardDomain domain.Cards
+		err := rows.Scan(&cardDomain.ID, &cardDomain.Name, &cardDomain.SetName, &cardDomain.CollectorNumber,
+			&cardDomain.Foil, &cardDomain.LastPrice, &cardDomain.OldPrice, &cardDomain.PriceChange, &cardDomain.LastUpdate)
+		if err != nil {
+			return nil, fmt.Errorf("repository failed to scan row in get cards paginated: %w", err)
+		}
+		cardsDomain = append(cardsDomain, cardDomain)
+	}
+
+	return cardsDomain, nil
+}
+
+func (r *repository) GetCardsCount(ctx context.Context, filters map[string]string) (int64, error) {
+	countQuery := `
+    SELECT COUNT(*)
+    FROM cards c
+    `
+
+	var first bool = true
+	var values []interface{}
+
+	for key, value := range filters {
+		if !first {
+			countQuery += " AND "
+		} else {
+			countQuery += " WHERE "
+		}
+		countQuery += fmt.Sprintf("%s = ?", key)
+		values = append(values, value)
+		first = false
+	}
+
+	row := r.db.QueryRowContext(ctx, countQuery, values...)
+
+	var count int64
+	err := row.Scan(&count)
+	if err != nil {
+		return 0, fmt.Errorf("repository failed to scan count in get cards count: %w", err)
+	}
+
+	return count, nil
+}

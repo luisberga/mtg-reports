@@ -26,3 +26,11 @@ type ResponseConciliateJob struct {
 	Processed    int64 `json:"processed"`
 	NotProcessed int64 `json:"not_processed"`
 }
+
+type ResponsePaginatedCards struct {
+	Cards      []ResponseCard `json:"cards"`
+	Page       int            `json:"page"`
+	Limit      int            `json:"limit"`
+	Total      int64          `json:"total"`
+	TotalPages int            `json:"total_pages"`
+}

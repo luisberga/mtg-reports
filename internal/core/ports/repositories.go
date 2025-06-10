@@ -10,6 +10,8 @@ type CardsRepository interface {
 	InsertCards(ctx context.Context, cards []domain.Cards) error
 	GetCardbyID(ctx context.Context, id string) (domain.Cards, error)
 	GetCards(ctx context.Context, filters map[string]string) ([]domain.Cards, error)
+	GetCardsPaginated(ctx context.Context, filters map[string]string, offset, limit int) ([]domain.Cards, error)
+	GetCardsCount(ctx context.Context, filters map[string]string) (int64, error)
 	DeleteCard(ctx context.Context, id string) error
 	GetCardHistory(ctx context.Context, id string) ([]domain.Cards, error)
 	UpdateCard(ctx context.Context, card domain.UpdateCard) (domain.Cards, error)

@@ -17,6 +17,7 @@ type validate interface {
 	CardID(parts []string) (string, error)
 	Filters(setName, name, collector_number string) map[string]string
 	CardName(card dtos.RequestUpdateCard) error
+	Pagination(pageStr, limitStr string) (int, int, error)
 }
 
 type apiHandler struct {
@@ -128,15 +129,21 @@ func (h *apiHandler) GetCards(w http.ResponseWriter, r *http.Request) {
 	setName := r.URL.Query().Get("set_name")
 	name := r.URL.Query().Get("name")
 	collector_number := r.URL.Query().Get("collector_number")
+	pageStr := r.URL.Query().Get("page")
+	limitStr := r.URL.Query().Get("limit")
 
 	filters := h.validator.Filters(setName, name, collector_number)
 
-	response, err := h.CardService.GetCards(r.Context(), filters)
-	if errors.Is(err, domain.ErrCardNotFound{}) {
-		h.log.WithError(err).Info("failed to get cards")
-		http.Error(w, domain.ErrCardNotFound{}.Error(), http.StatusBadRequest)
-	} else if err != nil {
-		h.log.WithError(err).Error("failed to get cards")
+	page, limit, err := h.validator.Pagination(pageStr, limitStr)
+	if err != nil {
+		h.log.WithError(err).Warn("failed to validate pagination parameters")
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	response, err := h.CardService.GetCardsPaginated(r.Context(), filters, page, limit)
+	if err != nil {
+		h.log.WithError(err).Error("failed to get cards paginated")
 		http.Error(w, ErrInternalErr{}.Error(), http.StatusInternalServerError)
 	} else {
 		h.log.Info("cards retrieved")
@@ -241,8 +248,10 @@ func encondeResponse(w http.ResponseWriter, response interface{}) {
 	jsonResponse, err := json.Marshal(response)
 	if err != nil {
 		http.Error(w, ErrInternalErr{}.Error(), http.StatusInternalServerError)
+		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
 	w.Write(jsonResponse)
 }
