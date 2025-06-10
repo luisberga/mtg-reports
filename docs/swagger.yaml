@@ -49,7 +49,7 @@ paths:
         '500':
           description: Internal server error. Failed to insert cards into the database.
     get:
-      summary: Get Magic The Gathering cards based on filters.
+      summary: Get Magic The Gathering cards based on filters with pagination.
       parameters:
         - name: set_name
           in: query
@@ -69,15 +69,32 @@ paths:
           description: Filter cards by collector number.
           schema:
             type: string
+        - name: page
+          in: query
+          required: false
+          description: Page number for pagination (default is 1).
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          required: false
+          description: Number of items per page (default is 10, max is 100).
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 10
       responses:
         '200':
-          description: Cards retrieved successfully.
+          description: Cards retrieved successfully with pagination information.
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/ResponseCard'
+                $ref: '#/components/schemas/ResponsePaginatedCards'
+        '400':
+          description: Bad request. Invalid pagination parameters.
         '500':
           description: Internal server error. Failed to retrieve cards.
   /card/{id}:
@@ -232,3 +249,22 @@ components:
           type: integer
         not_processed:
           type: integer
+    ResponsePaginatedCards:
+      type: object
+      properties:
+        cards:
+          type: array
+          items:
+            $ref: '#/components/schemas/ResponseCard'
+        total:
+          type: integer
+          description: Total number of cards matching the filters.
+        page:
+          type: integer
+          description: Current page number.
+        limit:
+          type: integer
+          description: Number of items per page.
+        total_pages:
+          type: integer
+          description: Total number of pages available.

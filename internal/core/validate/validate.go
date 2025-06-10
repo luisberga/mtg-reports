@@ -82,3 +82,32 @@ func (v *validator) Filters(setName, name, collector_number string) map[string]s
 
 	return filters
 }
+
+func (v *validator) Pagination(pageStr, limitStr string) (int, int, error) {
+	page := 1
+	limit := 20 // default limit
+
+	if pageStr != "" {
+		p, err := strconv.Atoi(pageStr)
+		if err != nil {
+			return 0, 0, errors.New("invalid page parameter")
+		}
+		if p < 1 {
+			return 0, 0, errors.New("page must be greater than 0")
+		}
+		page = p
+	}
+
+	if limitStr != "" {
+		l, err := strconv.Atoi(limitStr)
+		if err != nil {
+			return 0, 0, errors.New("invalid limit parameter")
+		}
+		if l < 1 || l > 100 {
+			return 0, 0, errors.New("limit must be between 1 and 100")
+		}
+		limit = l
+	}
+
+	return page, limit, nil
+}

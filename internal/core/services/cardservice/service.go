@@ -242,3 +242,49 @@ func (c *service) InsertCards(ctx context.Context, file multipart.File) (int64, 
 
 	return cardsProcessed, cardsNotProcessed
 }
+
+func (c *service) GetCardsPaginated(ctx context.Context, filters map[string]string, page, limit int) (dtos.ResponsePaginatedCards, error) {
+	offset := (page - 1) * limit
+
+	// Get total count
+	total, err := c.cardsRepository.GetCardsCount(ctx, filters)
+	if err != nil {
+		return dtos.ResponsePaginatedCards{}, fmt.Errorf("service failed to get cards count: %w", err)
+	}
+
+	// Get paginated cards
+	cardsDomain, err := c.cardsRepository.GetCardsPaginated(ctx, filters, offset, limit)
+	if err != nil {
+		return dtos.ResponsePaginatedCards{}, fmt.Errorf("service failed to get cards paginated: %w", err)
+	}
+
+	cards := make([]dtos.ResponseCard, 0, len(cardsDomain))
+	for _, card := range cardsDomain {
+		var lastUpdate time.Time
+		if card.LastUpdate != nil {
+			lastUpdate = *card.LastUpdate
+		}
+
+		cards = append(cards, dtos.ResponseCard{
+			ID:              card.ID,
+			Name:            card.Name,
+			Set:             card.SetName,
+			CollectorNumber: card.CollectorNumber,
+			Foil:            card.Foil,
+			LastPrice:       card.LastPrice,
+			OldPrice:        card.OldPrice,
+			PriceChange:     card.PriceChange,
+			LastUpdate:      lastUpdate,
+		})
+	}
+
+	totalPages := int((total + int64(limit) - 1) / int64(limit)) // Ceiling division
+
+	return dtos.ResponsePaginatedCards{
+		Cards:      cards,
+		Page:       page,
+		Limit:      limit,
+		Total:      total,
+		TotalPages: totalPages,
+	}, nil
+}
