@@ -12,7 +12,7 @@ type cards interface {
 	UpdateCard(w http.ResponseWriter, r *http.Request)
 }
 
-func SetupRouter(c cards) *http.ServeMux {
+func SetupRouter(c cards) http.Handler {
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("/card", func(w http.ResponseWriter, r *http.Request) {
@@ -50,5 +50,5 @@ func SetupRouter(c cards) *http.ServeMux {
 
 	mux.HandleFunc("/card-history/", c.GetCardHistory)
 
-	return mux
+	return CORSMiddleware(mux)
 }
