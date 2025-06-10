@@ -18,10 +18,47 @@ The API exposes several endpoints for card management. Here are the routes provi
 -   POST `/card`: Inserts a single card into the database.
 -   POST `/cards`: Inserts multiple cards into the database in bulk.
 -   GET `/card/{id}`: Retrieves a card by its ID.
--   GET `/cards`: Retrieves cards filtered by set name, card name, or collector number.
+-   GET `/cards`: Retrieves cards filtered by set name, card name, or collector number with pagination support.
 -   DELETE `/card/{id}`: Deletes a card by its ID.
--   GET `/card-history/{id}`: Retrieves the price history of a card by its ID.
+-   GET `/card-history/{id}`: Retrieves the price history of a card by its ID with pagination support.
 -   PATCH `/card/{id}`: Updates a card by its ID.
+-   GET `/collection-stats`: Retrieves collection statistics including total cards, foil cards, unique sets, and total value.
+
+### Pagination Support
+
+The following endpoints now support pagination:
+
+- `GET /cards`: Use `page` and `limit` query parameters to paginate through cards.
+- `GET /card-history/{id}`: Use `page` and `limit` query parameters to paginate through card price history.
+
+**Pagination Parameters:**
+- `page`: Page number (default: 1, minimum: 1)
+- `limit`: Number of items per page (default: 10, minimum: 1, maximum: 100)
+
+**Example:**
+```
+GET /cards?set_name=M21&page=2&limit=20
+GET /card-history/123?page=1&limit=10
+```
+
+### Collection Statistics
+
+The `GET /collection-stats` endpoint provides comprehensive statistics about your card collection:
+
+- **Total Cards**: Total number of cards in your collection
+- **Foil Cards**: Number of foil cards in your collection  
+- **Unique Sets**: Number of different MTG sets represented in your collection
+- **Total Value**: Combined monetary value of all cards in your collection
+
+**Example Response:**
+```json
+{
+  "total_cards": 1250,
+  "foil_cards": 180,
+  "unique_sets": 45,
+  "total_value": 2847.50
+}
+```
 
 ### Request and Response Formats
 

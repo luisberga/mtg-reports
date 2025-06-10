@@ -77,3 +77,21 @@ func (c *CardsRepositoryMock) GetCardsCount(ctx context.Context, filters map[str
 	args := c.Called(ctx, filters)
 	return args.Get(0).(int64), args.Error(1)
 }
+
+func (c *CardsRepositoryMock) GetCardHistoryPaginated(ctx context.Context, id string, offset, limit int) ([]domain.Cards, error) {
+	args := c.Called(ctx, id, offset, limit)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).([]domain.Cards), args.Error(1)
+}
+
+func (c *CardsRepositoryMock) GetCardHistoryCount(ctx context.Context, id string) (int64, error) {
+	args := c.Called(ctx, id)
+	return args.Get(0).(int64), args.Error(1)
+}
+
+func (c *CardsRepositoryMock) GetCollectionStats(ctx context.Context) (domain.CollectionStats, error) {
+	args := c.Called(ctx)
+	return args.Get(0).(domain.CollectionStats), args.Error(1)
+}

@@ -420,3 +420,106 @@ func (r *repository) GetCardsCount(ctx context.Context, filters map[string]strin
 
 	return count, nil
 }
+
+func (r *repository) GetCardHistoryPaginated(ctx context.Context, id string, offset, limit int) ([]domain.Cards, error) {
+	cards := []entities.MysqlCardPriceHistory{}
+
+	getQuery := `
+	SELECT 
+		c.id,
+		c.name,
+		c.set_name,
+		c.collector_number,
+		c.foil,
+		COALESCE(cd.last_price, 0),
+		COALESCE(cd.old_price, 0),
+		COALESCE(cd.price_change, 0),
+		cd.last_update
+	FROM 
+		cards c 
+	LEFT JOIN 
+		cards_details cd 
+	ON 
+		c.id = cd.card_id
+	WHERE 
+		c.id = ?
+	ORDER BY 
+		last_update DESC
+	LIMIT ? OFFSET ?;
+	`
+	rows, err := r.db.QueryContext(ctx, getQuery, id, limit, offset)
+	if err != nil {
+		return nil, fmt.Errorf("repository failed to query in get cards history paginated: %w", err)
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var card entities.MysqlCardPriceHistory
+		err = rows.Scan(&card.ID, &card.Name, &card.SetName, &card.CollectorNumber, &card.Foil, &card.LastPrice, &card.OldPrice, &card.PriceChange, &card.LastUpdate)
+		if err != nil {
+			return nil, fmt.Errorf("repository failed to scan rows in get cards history paginated: %w", err)
+		}
+		cards = append(cards, card)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, fmt.Errorf("repository failed after iterating rows in get cards history paginated: %w", err)
+	}
+
+	return factories.CardPriceHistoryToCardsDomain(cards), nil
+}
+
+func (r *repository) GetCardHistoryCount(ctx context.Context, id string) (int64, error) {
+	countQuery := `
+	SELECT COUNT(*)
+	FROM 
+		cards c 
+	LEFT JOIN 
+		cards_details cd 
+	ON 
+		c.id = cd.card_id
+	WHERE 
+		c.id = ?;
+	`
+
+	row := r.db.QueryRowContext(ctx, countQuery, id)
+
+	var count int64
+	err := row.Scan(&count)
+	if err != nil {
+		return 0, fmt.Errorf("repository failed to scan count in get card history count: %w", err)
+	}
+
+	return count, nil
+}
+
+func (r *repository) GetCollectionStats(ctx context.Context) (domain.CollectionStats, error) {
+	statsQuery := `
+	SELECT 
+		COUNT(*) as total_cards,
+		SUM(CASE WHEN foil = true THEN 1 ELSE 0 END) as foil_cards,
+		COUNT(DISTINCT set_name) as unique_sets,
+		COALESCE(SUM(cd.last_price), 0) as total_value
+	FROM 
+		cards c
+	LEFT JOIN 
+	(
+		SELECT *,
+			ROW_NUMBER() OVER(PARTITION BY card_id ORDER BY last_update DESC) AS rn
+		FROM 
+			cards_details
+	) cd
+	ON 
+		c.id = cd.card_id AND cd.rn = 1;
+	`
+
+	row := r.db.QueryRowContext(ctx, statsQuery)
+
+	var stats domain.CollectionStats
+	err := row.Scan(&stats.TotalCards, &stats.FoilCards, &stats.UniqueSets, &stats.TotalValue)
+	if err != nil {
+		return domain.CollectionStats{}, fmt.Errorf("repository failed to scan collection stats: %w", err)
+	}
+
+	return stats, nil
+}

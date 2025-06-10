@@ -49,6 +49,11 @@ func (m *mockCardsHandler) UpdateCard(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
+func (m *mockCardsHandler) GetCollectionStats(w http.ResponseWriter, r *http.Request) {
+	m.Called(w, r)
+	w.WriteHeader(http.StatusOK)
+}
+
 func TestSetupRouter_CardPOST(t *testing.T) {
 	mockHandler := &mockCardsHandler{}
 	router := SetupRouter(mockHandler)
@@ -191,4 +196,32 @@ func TestSetupRouter_CardHistory(t *testing.T) {
 
 	assert.Equal(t, http.StatusOK, resp.Code)
 	mockHandler.AssertExpectations(t)
+}
+
+func TestSetupRouter_CollectionStatsGET(t *testing.T) {
+	mockHandler := &mockCardsHandler{}
+	router := SetupRouter(mockHandler)
+
+	req := httptest.NewRequest(http.MethodGet, "/collection-stats", nil)
+	resp := httptest.NewRecorder()
+
+	mockHandler.On("GetCollectionStats", resp, req)
+
+	router.ServeHTTP(resp, req)
+
+	assert.Equal(t, http.StatusOK, resp.Code)
+	mockHandler.AssertExpectations(t)
+}
+
+func TestSetupRouter_CollectionStatsMethodNotAllowed(t *testing.T) {
+	mockHandler := &mockCardsHandler{}
+	router := SetupRouter(mockHandler)
+
+	req := httptest.NewRequest(http.MethodPost, "/collection-stats", nil)
+	resp := httptest.NewRecorder()
+
+	router.ServeHTTP(resp, req)
+
+	assert.Equal(t, http.StatusMethodNotAllowed, resp.Code)
+	assert.Contains(t, resp.Body.String(), "Method not allowed")
 }

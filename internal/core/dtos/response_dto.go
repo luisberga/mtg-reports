@@ -34,3 +34,10 @@ type ResponsePaginatedCards struct {
 	Total      int64          `json:"total"`
 	TotalPages int            `json:"total_pages"`
 }
+
+type ResponseCollectionStats struct {
+	TotalCards int64   `json:"total_cards"`
+	FoilCards  int64   `json:"foil_cards"`
+	UniqueSets int64   `json:"unique_sets"`
+	TotalValue float64 `json:"total_value"`
+}

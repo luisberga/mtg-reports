@@ -588,3 +588,167 @@ func TestService_GetCardHistory(t *testing.T) {
 func boolPtr(b bool) *bool {
 	return &b
 }
+
+func TestService_GetCardHistoryPaginated(t *testing.T) {
+	fixedTime := time.Date(2023, 12, 25, 10, 30, 0, 0, time.UTC)
+
+	tests := []struct {
+		name      string
+		id        string
+		page      int
+		limit     int
+		setupMock func(repoMock *mocks.CardsRepositoryMock)
+		want      dtos.ResponsePaginatedCards
+		wantErr   bool
+	}{
+		{
+			name:  "should get card history paginated successfully",
+			id:    "1",
+			page:  1,
+			limit: 10,
+			setupMock: func(repoMock *mocks.CardsRepositoryMock) {
+				repoMock.On("GetCardHistoryCount", mock.Anything, "1").Return(int64(2), nil)
+				returnCards := []domain.Cards{
+					{
+						ID:              1,
+						Name:            "Lightning Bolt",
+						SetName:         "M21",
+						CollectorNumber: "123",
+						Foil:            true,
+						CardsDetails: domain.CardsDetails{
+							LastPrice:   15.50,
+							OldPrice:    12.00,
+							PriceChange: 3.50,
+							LastUpdate:  &fixedTime,
+						},
+					},
+				}
+				repoMock.On("GetCardHistoryPaginated", mock.Anything, "1", 0, 10).Return(returnCards, nil)
+			},
+			want: dtos.ResponsePaginatedCards{
+				Cards: []dtos.ResponseCard{
+					{
+						ID:              1,
+						Name:            "Lightning Bolt",
+						Set:             "M21",
+						CollectorNumber: "123",
+						Foil:            true,
+						LastPrice:       15.50,
+						OldPrice:        12.00,
+						PriceChange:     3.50,
+						LastUpdate:      fixedTime,
+					},
+				},
+				Page:       1,
+				Limit:      10,
+				Total:      2,
+				TotalPages: 1,
+			},
+			wantErr: false,
+		},
+		{
+			name:  "should return error when repository fails to get count",
+			id:    "1",
+			page:  1,
+			limit: 10,
+			setupMock: func(repoMock *mocks.CardsRepositoryMock) {
+				repoMock.On("GetCardHistoryCount", mock.Anything, "1").Return(int64(0), errors.New("repository error"))
+			},
+			want:    dtos.ResponsePaginatedCards{},
+			wantErr: true,
+		},
+		{
+			name:  "should return error when repository fails to get paginated history",
+			id:    "1",
+			page:  1,
+			limit: 10,
+			setupMock: func(repoMock *mocks.CardsRepositoryMock) {
+				repoMock.On("GetCardHistoryCount", mock.Anything, "1").Return(int64(2), nil)
+				repoMock.On("GetCardHistoryPaginated", mock.Anything, "1", 0, 10).Return(nil, errors.New("repository error"))
+			},
+			want:    dtos.ResponsePaginatedCards{},
+			wantErr: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			repoMock := mocks.NewCardsRepositoryMock()
+			logMock := mocks.NewLogMock()
+
+			tt.setupMock(repoMock)
+
+			service := New(repoMock, 100, logMock)
+			got, err := service.GetCardHistoryPaginated(context.Background(), tt.id, tt.page, tt.limit)
+
+			if tt.wantErr {
+				assert.Error(t, err)
+				assert.Contains(t, err.Error(), "service failed to get card history")
+			} else {
+				assert.NoError(t, err)
+			}
+
+			assert.Equal(t, tt.want, got)
+			repoMock.AssertExpectations(t)
+		})
+	}
+}
+
+func TestService_GetCollectionStats(t *testing.T) {
+	tests := []struct {
+		name      string
+		setupMock func(repoMock *mocks.CardsRepositoryMock)
+		want      dtos.ResponseCollectionStats
+		wantErr   bool
+	}{
+		{
+			name: "should get collection stats successfully",
+			setupMock: func(repoMock *mocks.CardsRepositoryMock) {
+				stats := domain.CollectionStats{
+					TotalCards: 100,
+					FoilCards:  25,
+					UniqueSets: 10,
+					TotalValue: 1500.50,
+				}
+				repoMock.On("GetCollectionStats", mock.Anything).Return(stats, nil)
+			},
+			want: dtos.ResponseCollectionStats{
+				TotalCards: 100,
+				FoilCards:  25,
+				UniqueSets: 10,
+				TotalValue: 1500.50,
+			},
+			wantErr: false,
+		},
+		{
+			name: "should return error when repository fails",
+			setupMock: func(repoMock *mocks.CardsRepositoryMock) {
+				repoMock.On("GetCollectionStats", mock.Anything).Return(domain.CollectionStats{}, errors.New("repository error"))
+			},
+			want:    dtos.ResponseCollectionStats{},
+			wantErr: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			repoMock := mocks.NewCardsRepositoryMock()
+			logMock := mocks.NewLogMock()
+
+			tt.setupMock(repoMock)
+
+			service := New(repoMock, 100, logMock)
+			got, err := service.GetCollectionStats(context.Background())
+
+			if tt.wantErr {
+				assert.Error(t, err)
+				assert.Contains(t, err.Error(), "service failed to get collection stats")
+			} else {
+				assert.NoError(t, err)
+			}
+
+			assert.Equal(t, tt.want, got)
+			repoMock.AssertExpectations(t)
+		})
+	}
+}
