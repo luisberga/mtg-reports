@@ -55,3 +55,13 @@ func (c *CardServiceMock) GetCardsPaginated(ctx context.Context, filters map[str
 	args := c.Called(ctx, filters, page, limit)
 	return args.Get(0).(dtos.ResponsePaginatedCards), args.Error(1)
 }
+
+func (c *CardServiceMock) GetCardHistoryPaginated(ctx context.Context, id string, page, limit int) (dtos.ResponsePaginatedCards, error) {
+	args := c.Called(ctx, id, page, limit)
+	return args.Get(0).(dtos.ResponsePaginatedCards), args.Error(1)
+}
+
+func (c *CardServiceMock) GetCollectionStats(ctx context.Context) (dtos.ResponseCollectionStats, error) {
+	args := c.Called(ctx)
+	return args.Get(0).(dtos.ResponseCollectionStats), args.Error(1)
+}

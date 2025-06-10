@@ -288,3 +288,63 @@ func (c *service) GetCardsPaginated(ctx context.Context, filters map[string]stri
 		TotalPages: totalPages,
 	}, nil
 }
+
+func (c *service) GetCardHistoryPaginated(ctx context.Context, id string, page, limit int) (dtos.ResponsePaginatedCards, error) {
+	offset := (page - 1) * limit
+
+	// Get total count
+	total, err := c.cardsRepository.GetCardHistoryCount(ctx, id)
+	if err != nil {
+		return dtos.ResponsePaginatedCards{}, fmt.Errorf("service failed to get card history count: %w", err)
+	}
+
+	// Get paginated card history
+	cardsDomain, err := c.cardsRepository.GetCardHistoryPaginated(ctx, id, offset, limit)
+	if err != nil {
+		return dtos.ResponsePaginatedCards{}, fmt.Errorf("service failed to get card history paginated: %w", err)
+	}
+
+	cards := make([]dtos.ResponseCard, 0, len(cardsDomain))
+	for _, card := range cardsDomain {
+		var lastUpdate time.Time
+		if card.LastUpdate != nil {
+			lastUpdate = *card.LastUpdate
+		}
+
+		cards = append(cards, dtos.ResponseCard{
+			ID:              card.ID,
+			Name:            card.Name,
+			Set:             card.SetName,
+			CollectorNumber: card.CollectorNumber,
+			Foil:            card.Foil,
+			LastPrice:       card.LastPrice,
+			OldPrice:        card.OldPrice,
+			PriceChange:     card.PriceChange,
+			LastUpdate:      lastUpdate,
+		})
+	}
+
+	totalPages := int((total + int64(limit) - 1) / int64(limit)) // Ceiling division
+
+	return dtos.ResponsePaginatedCards{
+		Cards:      cards,
+		Page:       page,
+		Limit:      limit,
+		Total:      total,
+		TotalPages: totalPages,
+	}, nil
+}
+
+func (c *service) GetCollectionStats(ctx context.Context) (dtos.ResponseCollectionStats, error) {
+	stats, err := c.cardsRepository.GetCollectionStats(ctx)
+	if err != nil {
+		return dtos.ResponseCollectionStats{}, fmt.Errorf("service failed to get collection stats: %w", err)
+	}
+
+	return dtos.ResponseCollectionStats{
+		TotalCards: stats.TotalCards,
+		FoilCards:  stats.FoilCards,
+		UniqueSets: stats.UniqueSets,
+		TotalValue: stats.TotalValue,
+	}, nil
+}

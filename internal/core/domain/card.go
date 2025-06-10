@@ -53,3 +53,10 @@ type CardsPrice struct {
 	PriceChange float64
 	LastUpdate  *time.Time
 }
+
+type CollectionStats struct {
+	TotalCards int64
+	FoilCards  int64
+	UniqueSets int64
+	TotalValue float64
+}

@@ -510,8 +510,25 @@ func Test_GetCardHistory(t *testing.T) {
 			wantCode: http.StatusBadRequest,
 		},
 		{
+			name: "should return StatusBadRequest when pagination validation fails",
+			url:  "/card/1/history?page=invalid&limit=10",
+			mockSetup: func(
+				sMock *mocks.CardServiceMock,
+				vMock *mocks.ValidateMock,
+				lMock *mocks.LogMock,
+				cMock *mocks.CustomMock,
+			) {
+				lMock.On("Info", mock.Anything).Once()
+				lMock.On("WithError", mock.Anything).Return(cMock).Once()
+				cMock.On("Warn", mock.Anything).Once()
+				vMock.On("CardID", mock.Anything).Return("1", nil)
+				vMock.On("Pagination", "invalid", "10").Return(0, 0, errors.New("invalid page"))
+			},
+			wantCode: http.StatusBadRequest,
+		},
+		{
 			name: "should return StatusOK when history is retrieved",
-			url:  "/card/1/history",
+			url:  "/card/1/history?page=1&limit=10",
 			mockSetup: func(
 				sMock *mocks.CardServiceMock,
 				vMock *mocks.ValidateMock,
@@ -520,7 +537,8 @@ func Test_GetCardHistory(t *testing.T) {
 			) {
 				lMock.On("Info", mock.Anything).Twice()
 				vMock.On("CardID", mock.Anything).Return("1", nil)
-				sMock.On("GetCardHistory", mock.Anything, "1").Return([]dtos.ResponseCard{}, nil)
+				vMock.On("Pagination", "1", "10").Return(1, 10, nil)
+				sMock.On("GetCardHistoryPaginated", mock.Anything, "1", 1, 10).Return(dtos.ResponsePaginatedCards{}, nil)
 			},
 			wantCode: http.StatusOK,
 		},
@@ -541,6 +559,78 @@ func Test_GetCardHistory(t *testing.T) {
 			resp := httptest.NewRecorder()
 
 			h.GetCardHistory(resp, req)
+
+			assert.Equal(t, tt.wantCode, resp.Code)
+
+			sMock.AssertExpectations(t)
+			vMock.AssertExpectations(t)
+			lMock.AssertExpectations(t)
+			cMock.AssertExpectations(t)
+		})
+	}
+}
+
+func Test_GetCollectionStats(t *testing.T) {
+	tests := []struct {
+		name      string
+		mockSetup func(
+			sMock *mocks.CardServiceMock,
+			vMock *mocks.ValidateMock,
+			lMock *mocks.LogMock,
+			cMock *mocks.CustomMock,
+		)
+		wantCode int
+	}{
+		{
+			name: "should return StatusOK when stats are retrieved",
+			mockSetup: func(
+				sMock *mocks.CardServiceMock,
+				vMock *mocks.ValidateMock,
+				lMock *mocks.LogMock,
+				cMock *mocks.CustomMock,
+			) {
+				lMock.On("Info", mock.Anything).Twice()
+				sMock.On("GetCollectionStats", mock.Anything).Return(dtos.ResponseCollectionStats{
+					TotalCards: 100,
+					FoilCards:  25,
+					UniqueSets: 10,
+					TotalValue: 1500.50,
+				}, nil)
+			},
+			wantCode: http.StatusOK,
+		},
+		{
+			name: "should return StatusInternalServerError when service fails",
+			mockSetup: func(
+				sMock *mocks.CardServiceMock,
+				vMock *mocks.ValidateMock,
+				lMock *mocks.LogMock,
+				cMock *mocks.CustomMock,
+			) {
+				lMock.On("Info", mock.Anything).Once()
+				lMock.On("WithError", mock.Anything).Return(cMock).Once()
+				cMock.On("Error", mock.Anything).Once()
+				sMock.On("GetCollectionStats", mock.Anything).Return(dtos.ResponseCollectionStats{}, errors.New("service error"))
+			},
+			wantCode: http.StatusInternalServerError,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			sMock := mocks.NewCardServiceMock()
+			vMock := mocks.NewValidateMock()
+			lMock := mocks.NewLogMock()
+			cMock := mocks.NewCustomMock()
+
+			tt.mockSetup(sMock, vMock, lMock, cMock)
+
+			h := New(vMock, sMock, lMock)
+
+			req, _ := http.NewRequest(http.MethodGet, "/collection-stats", nil)
+			resp := httptest.NewRecorder()
+
+			h.GetCollectionStats(resp, req)
 
 			assert.Equal(t, tt.wantCode, resp.Code)
 

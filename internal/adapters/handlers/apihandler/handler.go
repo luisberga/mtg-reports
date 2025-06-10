@@ -182,7 +182,17 @@ func (h *apiHandler) GetCardHistory(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response, err := h.CardService.GetCardHistory(r.Context(), id)
+	pageStr := r.URL.Query().Get("page")
+	limitStr := r.URL.Query().Get("limit")
+
+	page, limit, err := h.validator.Pagination(pageStr, limitStr)
+	if err != nil {
+		h.log.WithError(err).Warn("failed to validate pagination parameters")
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	response, err := h.CardService.GetCardHistoryPaginated(r.Context(), id, page, limit)
 	if errors.Is(err, domain.ErrCardNotFound{}) {
 		h.log.WithError(err).Warn("failed to get card history")
 		http.Error(w, domain.ErrCardNotFound{}.Error(), http.StatusBadRequest)
@@ -190,7 +200,7 @@ func (h *apiHandler) GetCardHistory(w http.ResponseWriter, r *http.Request) {
 		h.log.WithError(err).Error("failed to get card history")
 		http.Error(w, ErrInternalErr{}.Error(), http.StatusInternalServerError)
 	} else {
-		h.log.Info("card retrieved")
+		h.log.Info("card history retrieved")
 		encondeResponse(w, response)
 	}
 }
@@ -240,6 +250,19 @@ func (h *apiHandler) UpdateCard(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, ErrInternalErr{}.Error(), http.StatusInternalServerError)
 	} else {
 		h.log.Info("card updated")
+		encondeResponse(w, response)
+	}
+}
+
+func (h *apiHandler) GetCollectionStats(w http.ResponseWriter, r *http.Request) {
+	h.log.Info("handler get collection stats")
+
+	response, err := h.CardService.GetCollectionStats(r.Context())
+	if err != nil {
+		h.log.WithError(err).Error("failed to get collection stats")
+		http.Error(w, ErrInternalErr{}.Error(), http.StatusInternalServerError)
+	} else {
+		h.log.Info("collection stats retrieved")
 		encondeResponse(w, response)
 	}
 }

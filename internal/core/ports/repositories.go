@@ -14,7 +14,10 @@ type CardsRepository interface {
 	GetCardsCount(ctx context.Context, filters map[string]string) (int64, error)
 	DeleteCard(ctx context.Context, id string) error
 	GetCardHistory(ctx context.Context, id string) ([]domain.Cards, error)
+	GetCardHistoryPaginated(ctx context.Context, id string, offset, limit int) ([]domain.Cards, error)
+	GetCardHistoryCount(ctx context.Context, id string) (int64, error)
 	UpdateCard(ctx context.Context, card domain.UpdateCard) (domain.Cards, error)
+	GetCollectionStats(ctx context.Context) (domain.CollectionStats, error)
 }
 
 type ConciliateRepository interface {

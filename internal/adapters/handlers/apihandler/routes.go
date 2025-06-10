@@ -10,6 +10,7 @@ type cards interface {
 	DeleteCard(http.ResponseWriter, *http.Request)
 	GetCardHistory(w http.ResponseWriter, r *http.Request)
 	UpdateCard(w http.ResponseWriter, r *http.Request)
+	GetCollectionStats(w http.ResponseWriter, r *http.Request)
 }
 
 func SetupRouter(c cards) http.Handler {
@@ -49,6 +50,15 @@ func SetupRouter(c cards) http.Handler {
 	})
 
 	mux.HandleFunc("/card-history/", c.GetCardHistory)
+
+	mux.HandleFunc("/collection-stats", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodGet:
+			c.GetCollectionStats(w, r)
+		default:
+			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		}
+	})
 
 	return CORSMiddleware(mux)
 }

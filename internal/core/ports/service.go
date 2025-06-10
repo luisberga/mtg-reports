@@ -14,7 +14,9 @@ type CardService interface {
 	GetCardsPaginated(ctx context.Context, filters map[string]string, page, limit int) (dtos.ResponsePaginatedCards, error)
 	DeleteCard(ctx context.Context, id string) error
 	GetCardHistory(ctx context.Context, id string) ([]dtos.ResponseCard, error)
+	GetCardHistoryPaginated(ctx context.Context, id string, page, limit int) (dtos.ResponsePaginatedCards, error)
 	UpdateCard(ctx context.Context, cardRequest dtos.RequestUpdateCard) (dtos.ResponseInsertCard, error)
+	GetCollectionStats(ctx context.Context) (dtos.ResponseCollectionStats, error)
 }
 
 type PriceService interface {
